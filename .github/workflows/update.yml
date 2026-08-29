@@ -7,14 +7,13 @@ on:
   # Возможность ручного запуска из вкладки Actions
   workflow_dispatch:
 
-# Разрешения для токена GITHUB_TOKEN (необходимы для коммита и пуша)
+# Разрешения для токена GITHUB_TOKEN
 permissions:
   contents: write
 
 jobs:
   update-proxies:
     runs-on: ubuntu-latest
-
     steps:
       # 1. Клонирование репозитория
       - name: Checkout repository
@@ -27,13 +26,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip' # Включает автоматическое кэширование пакетов
+          cache: 'pip'
 
-      # 3. Установка зависимостей
+      # 3. Установка зависимостей из requirements.txt (Правильный подход!)
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install aiohttp
+          pip install -r requirements.txt
 
       # 4. Запуск скрипта сборщика
       - name: Run proxy updater script
@@ -46,15 +45,15 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Синхронизация на случай параллельных изменений
-          git pull --rebase origin main
+          git pull --rebase origin main || git pull --rebase origin master
           
-          # Проверяем, есть ли изменения в файле. Если нет - завершаем шаг успешно (exit 0)
+          # Проверяем, есть ли изменения в файле. Если нет - завершаем шаг успешно
           if git diff --quiet proxies.json; then
             echo "✅ No changes to proxies.json. Skipping commit."
             exit 0
           else
             git add proxies.json
             git commit -m "chore: auto-update proxies.json [skip ci]"
-            git push origin main
+            git push origin main || git push origin master
             echo "✅ Successfully updated and pushed proxies.json"
           fi
