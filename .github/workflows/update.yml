@@ -20,13 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Получаем полную историю для корректного rebase/pull
+          fetch-depth: 0
 
-      # 2. Установка Python 3.11
+      # 2. Установка Python 3.11 с кэшированием зависимостей pip
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip' # Включает автоматическое кэширование пакетов
 
       # 3. Установка зависимостей
       - name: Install dependencies
@@ -38,22 +39,22 @@ jobs:
       - name: Run proxy updater script
         run: python update_proxies.py
 
-      # 5. Настройка Git и сохранение изменений
+      # 5. Настройка Git и безопасное сохранение изменений
       - name: Commit and push changes
         run: |
-          # Настраиваем пользователя от имени которого будет сделан коммит
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Синхронизируемся с удаленным репозиторием на случай параллельных изменений
+          # Синхронизация на случай параллельных изменений
           git pull --rebase origin main
           
-          # Проверяем, есть ли изменения в файле
+          # Проверяем, есть ли изменения в файле. Если нет - завершаем шаг успешно (exit 0)
           if git diff --quiet proxies.json; then
-            echo "No changes to proxies.json. Skipping commit."
+            echo "✅ No changes to proxies.json. Skipping commit."
+            exit 0
           else
             git add proxies.json
             git commit -m "chore: auto-update proxies.json [skip ci]"
             git push origin main
-            echo "Successfully updated and pushed proxies.json"
+            echo "✅ Successfully updated and pushed proxies.json"
           fi
