@@ -17,7 +17,7 @@ jobs:
     steps:
       # 1. Клонирование репозитория
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -28,11 +28,11 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      # 3. Установка зависимостей из requirements.txt (Правильный подход!)
+      # 3. Установка зависимостей
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install aiohttp
 
       # 4. Запуск скрипта сборщика
       - name: Run proxy updater script
@@ -44,23 +44,20 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # ГАРАНТИЯ: Если файл proxies.json вообще не существует, создаем базовый пустой JSON
-          if [ ! -f proxies.json ]; then
-            echo "⚠️ Файл proxies.json не был создан скриптом. Создаем пустой шаблон..."
-            echo '{"updated_at": "unknown", "total": 0, "proxies": [], "error": "Generation failed"}' > proxies.json
-          fi
-          
-          git add proxies.json
+          # Определяем текущую ветку
+          CURRENT_BRANCH=$(git branch --show-current)
+          echo "Current branch: $CURRENT_BRANCH"
           
           # Синхронизация на случай параллельных изменений
-          git pull --rebase origin main || git pull --rebase origin master
+          git pull --rebase origin $CURRENT_BRANCH || true
           
-          # Проверяем, есть ли реальные изменения в добавленном файле
-          if git diff --cached --quiet proxies.json; then
-            echo "✅ No changes to proxies.json. Skipping commit."
+          # Проверяем, есть ли изменения в файле
+          if git diff --quiet proxies.json; then
+            echo "No changes to proxies.json. Skipping commit."
             exit 0
           else
+            git add proxies.json
             git commit -m "chore: auto-update proxies.json [skip ci]"
-            git push origin main || git push origin master
-            echo "✅ Successfully updated and pushed proxies.json"
+            git push origin $CURRENT_BRANCH
+            echo "Successfully updated and pushed proxies.json"
           fi
