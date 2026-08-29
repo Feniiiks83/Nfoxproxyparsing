@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Telegram Proxy Hub | NiihoFox</title>
-    <meta name="description" content="Быстрый и безопасный доступ к Telegram через MTProto и SOCKS5 прокси">
+    <meta name="description" content="Динамический портал для управления и подключения к Telegram прокси">
     
     <style>
         /* =========================================
@@ -16,7 +16,6 @@
             --accent-glow: rgba(0, 136, 204, 0.4);
             --gold-accent: #fbbf24;
             
-            /* Dark Theme (Default) */
             --bg-color: #0f172a;
             --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 136, 204, 0.15) 0%, transparent 40%),
                            radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
@@ -61,9 +60,6 @@
             padding-bottom: 90px;
         }
 
-        /* =========================================
-           UTILITIES & GLASSMORPHISM
-           ========================================= */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -91,9 +87,7 @@
         }
         .btn-secondary:hover { background: var(--card-hover); border-color: var(--accent-secondary); }
 
-        /* =========================================
-           NAVIGATION
-           ========================================= */
+        /* Navigation */
         .navbar {
             position: sticky; top: 0; z-index: 100; height: var(--nav-height);
             display: flex; align-items: center; justify-content: space-between;
@@ -102,55 +96,42 @@
         }
         [data-theme="light"] .navbar { background: rgba(241, 245, 249, 0.85); }
 
-        .logo {
-            display: flex; align-items: center; gap: 10px; font-weight: 800;
-            font-size: 1.25rem; color: var(--text-primary); text-decoration: none;
-        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; color: var(--text-primary); text-decoration: none; }
         .logo svg { width: 32px; height: 32px; fill: var(--accent-primary); }
 
         .nav-tabs { display: flex; gap: 8px; }
         .nav-tab {
             padding: 8px 16px; border-radius: 10px; color: var(--text-secondary);
-            text-decoration: none; font-weight: 500; transition: var(--transition);
-            cursor: pointer; border: none; background: transparent; font-size: 0.95rem;
+            font-weight: 500; transition: var(--transition); cursor: pointer; border: none; background: transparent; font-size: 0.95rem;
         }
         .nav-tab.active { color: var(--accent-secondary); background: rgba(56, 189, 248, 0.1); }
 
         .theme-toggle {
-            background: transparent; border: 1px solid var(--glass-border);
-            color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary);
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: var(--transition);
         }
         .theme-toggle:hover { background: var(--card-hover); transform: rotate(15deg); }
 
-        /* Mobile Bottom Nav */
         .mobile-nav {
             display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
-            background: var(--glass-bg); backdrop-filter: blur(16px);
-            border-top: 1px solid var(--glass-border); z-index: 100;
-            justify-content: space-around; align-items: center;
-            padding-bottom: env(safe-area-inset-bottom);
+            background: var(--glass-bg); backdrop-filter: blur(16px); border-top: 1px solid var(--glass-border);
+            z-index: 100; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom);
         }
         .mobile-nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--text-secondary); text-decoration: none; font-size: 0.75rem;
-            font-weight: 500; cursor: pointer; padding: 8px 16px; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-secondary);
+            font-size: 0.75rem; font-weight: 500; cursor: pointer; padding: 8px 16px; border-radius: 12px;
             transition: var(--transition); background: none; border: none;
         }
         .mobile-nav-item.active { color: var(--accent-secondary); }
         .mobile-nav-item svg { width: 24px; height: 24px; }
 
-        /* =========================================
-           SECTIONS & ANIMATIONS
-           ========================================= */
+        /* Sections & Animations */
         .section { display: none; animation: fadeIn 0.4s ease-out; padding: 30px 0; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* =========================================
-           HOME TAB STYLES
-           ========================================= */
+        /* Home Tab */
         .hero { text-align: center; padding: 40px 20px; margin-bottom: 30px; }
         .hero h1 {
             font-size: 2.2rem; font-weight: 800; margin-bottom: 16px;
@@ -159,7 +140,6 @@
         }
         .hero p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto 24px; line-height: 1.6; }
 
-        /* TOP-1 Banner */
         .top-proxy-banner {
             padding: 24px; margin-bottom: 30px; position: relative; overflow: visible;
             border: 1px solid rgba(251, 191, 36, 0.3);
@@ -168,87 +148,38 @@
         .top-proxy-banner::before {
             content: '👑 ТОП-1'; position: absolute; top: 12px; right: 12px;
             background: rgba(251, 191, 36, 0.2); color: var(--gold-accent);
-            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;
-            letter-spacing: 0.5px;
+            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px;
         }
         .top-proxy-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
         .top-proxy-flag { font-size: 3rem; }
         .top-proxy-info h3 { font-size: 1.5rem; margin-bottom: 4px; }
         .top-proxy-info .ping { font-size: 1.1rem; font-weight: 700; color: var(--ping-low); }
 
-        /* --- FIXED GRANULAR ACTIONS --- */
-        .granular-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* IP и Порт делят строку поровну */
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
+        .granular-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .copy-chip {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-            cursor: pointer;
-            transition: var(--transition);
-            gap: 8px;
+            display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
+            background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid var(--glass-border);
+            cursor: pointer; transition: var(--transition); gap: 8px;
         }
         [data-theme="light"] .copy-chip { background: rgba(255,255,255,0.5); }
         .copy-chip:hover { border-color: var(--accent-secondary); background: var(--card-hover); }
-        
-        /* Секретный ключ занимает всю ширину */
-        .copy-chip.secret-chip {
-            grid-column: 1 / -1;
-        }
-
-        .copy-chip-content {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 0; /* КРИТИЧЕСКИ ВАЖНО: позволяет тексту переноситься внутри flex */
-        }
-        
-        .copy-chip-label {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-        
+        .copy-chip.secret-chip { grid-column: 1 / -1; }
+        .copy-chip-content { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .copy-chip-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
         .copy-chip-value {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            word-break: break-all; /* Позволяет длинным IP/ключам переноситься, а не обрезаться */
-            line-height: 1.3;
+            font-family: 'Courier New', monospace; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-primary); word-break: break-all; line-height: 1.3;
         }
-        
-        .copy-chip svg {
-            width: 16px;
-            height: 16px;
-            color: var(--accent-secondary);
-            flex-shrink: 0; /* ЗАЩИТА: иконка никогда не сожмется и не перекроется текстом */
-        }
+        .copy-chip svg { width: 16px; height: 16px; color: var(--accent-secondary); flex-shrink: 0; }
 
-        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 30px; }
         .stat-card { padding: 20px; text-align: center; }
         .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--accent-secondary); margin-bottom: 4px; }
         .stat-label { color: var(--text-secondary); font-size: 0.85rem; }
 
-        /* =========================================
-           PROXY LIST STYLES
-           ========================================= */
+        /* Proxy List & Controls */
         .controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; align-items: center; }
-        .filter-group {
-            display: flex; gap: 4px; background: var(--glass-bg); padding: 4px;
-            border-radius: 12px; border: 1px solid var(--glass-border);
-        }
+        .filter-group { display: flex; gap: 4px; background: var(--glass-bg); padding: 4px; border-radius: 12px; border: 1px solid var(--glass-border); }
         .filter-btn {
             padding: 8px 16px; border-radius: 8px; border: none; background: transparent;
             color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: var(--transition);
@@ -264,7 +195,7 @@
         .search-box input:focus { border-color: var(--accent-secondary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
         .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-secondary); }
 
-        .proxy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .proxy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; min-height: 200px; }
         .proxy-card { padding: 20px; transition: var(--transition); position: relative; }
         .proxy-card:hover { transform: translateY(-4px); border-color: rgba(56, 189, 248, 0.3); }
 
@@ -272,19 +203,43 @@
         .proxy-country { display: flex; align-items: center; gap: 10px; }
         .flag { font-size: 1.5rem; }
         .country-name { font-weight: 600; font-size: 1.05rem; }
-        .protocol-badge {
-            padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .protocol-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .protocol-badge.mtproto { background: rgba(0, 136, 204, 0.2); color: var(--accent-secondary); }
         .protocol-badge.socks5 { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
 
         .proxy-card-actions { display: flex; gap: 8px; margin-top: 16px; }
         .proxy-card-actions .btn { flex: 1; padding: 8px; font-size: 0.85rem; }
 
-        /* =========================================
-           MODAL & TOAST
-           ========================================= */
+        /* Loader & Empty State */
+        .loader-container { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; min-height: 200px; }
+        .loader {
+            width: 40px; height: 40px; border: 3px solid var(--glass-border);
+            border-top: 3px solid var(--accent-primary); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .empty-state {
+            grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-secondary);
+        }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+        /* Pagination */
+        .pagination {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-top: 30px; flex-wrap: wrap;
+        }
+        .page-btn {
+            min-width: 40px; height: 40px; padding: 0 12px; border-radius: 10px;
+            border: 1px solid var(--glass-border); background: var(--glass-bg);
+            color: var(--text-primary); font-weight: 600; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; justify-content: center;
+        }
+        .page-btn:hover:not(:disabled) { background: var(--card-hover); border-color: var(--accent-secondary); }
+        .page-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Modal & Toast */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
@@ -298,10 +253,7 @@
             text-align: center; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-close {
-            position: absolute; top: 16px; right: 16px; background: transparent;
-            border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;
-        }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; }
         .qr-image { width: 220px; height: 220px; margin: 20px auto; border-radius: 12px; background: white; padding: 10px; }
 
         .toast-container {
@@ -309,18 +261,15 @@
             z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px;
         }
         .toast {
-            background: var(--glass-bg); backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border); color: var(--text-primary);
-            padding: 14px 20px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeOut 0.4s ease 2.6s forwards;
+            background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border);
+            color: var(--text-primary); padding: 14px 20px; border-radius: 12px;
+            display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeOut 0.4s ease 2.6s forwards;
         }
         .toast.success { border-left: 4px solid var(--ping-low); }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; transform: translateY(20px); } }
 
-        /* =========================================
-           RESPONSIVE
-           ========================================= */
         @media (max-width: 768px) {
             .nav-tabs, .navbar .theme-toggle { display: none; }
             .mobile-nav { display: flex; }
@@ -335,7 +284,6 @@
 </head>
 <body>
 
-    <!-- Navigation -->
     <nav class="navbar">
         <a href="#" class="logo" onclick="switchTab('home')">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .24z"/></svg>
@@ -351,16 +299,14 @@
     </nav>
 
     <main class="container">
-        <!-- HOME SECTION -->
         <section id="home" class="section active">
             <div class="hero glass">
                 <h1>Добро пожаловать, NiihoFox</h1>
-                <p>Многофункциональный портал для управления и мгновенного подключения к лучшим Telegram прокси-серверам с минимальной задержкой.</p>
+                <p>Динамический портал для управления и мгновенного подключения к лучшим Telegram прокси-серверам с минимальной задержкой.</p>
             </div>
 
-            <!-- TOP-1 Best Proxy Banner -->
             <div id="topProxyContainer">
-                <!-- Injected via JS -->
+                <div class="loader-container"><div class="loader"></div></div>
             </div>
 
             <div class="stats-grid">
@@ -379,7 +325,6 @@
             </div>
         </section>
 
-        <!-- PROXIES SECTION -->
         <section id="proxies" class="section">
             <div class="controls">
                 <div class="filter-group">
@@ -392,13 +337,15 @@
                     <input type="text" id="searchInput" placeholder="Поиск по стране или IP..." oninput="handleSearch(this.value)">
                 </div>
             </div>
+            
             <div id="proxyGrid" class="proxy-grid">
-                <!-- Injected via JS -->
+                <div class="loader-container"><div class="loader"></div></div>
             </div>
+            
+            <div id="paginationContainer" class="pagination"></div>
         </section>
     </main>
 
-    <!-- Mobile Bottom Navigation -->
     <nav class="mobile-nav">
         <button class="mobile-nav-item active" onclick="switchTab('home')" data-tab="home">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -414,7 +361,6 @@
         </button>
     </nav>
 
-    <!-- QR Code Modal -->
     <div id="qrModal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content glass" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal()">
@@ -427,31 +373,23 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
     <script>
         // =========================================
-        // STATE & MOCK DATA
+        // STATE MANAGEMENT
         // =========================================
-        const mockProxies = [
-            { id: 1, protocol: 'MTProto', country: 'Germany', flag: '🇩🇪', ip: '142.250.185.46', port: 443, ping: 45, secret: 'dd1234567890abcdef1234567890abcdef', status: 'online' },
-            { id: 2, protocol: 'SOCKS5', country: 'USA', flag: '🇺🇸', ip: '104.248.123.45', port: 1080, ping: 120, secret: null, status: 'online' },
-            { id: 3, protocol: 'MTProto', country: 'Netherlands', flag: '🇳🇱', ip: '185.199.108.153', port: 8443, ping: 89, secret: 'ee0987654321fedcba0987654321fedcba', status: 'online' },
-            { id: 4, protocol: 'MTProto', country: 'Singapore', flag: '🇸🇬', ip: '52.77.210.11', port: 443, ping: 210, secret: 'ff112233445566778899aabbccddeeff', status: 'online' },
-            { id: 5, protocol: 'SOCKS5', country: 'Japan', flag: '🇯🇵', ip: '13.114.45.67', port: 1080, ping: 145, secret: null, status: 'online' },
-            { id: 6, protocol: 'MTProto', country: 'France', flag: '🇫🇷', ip: '51.158.123.89', port: 443, ping: 65, secret: 'aa112233445566778899001122334455', status: 'online' }
-        ];
-
         let state = {
             proxies: [],
             filter: 'all',
             search: '',
+            currentPage: 1,
+            itemsPerPage: 10,
             theme: localStorage.getItem('theme') || 'dark'
         };
 
         // =========================================
-        // INITIALIZATION
+        // INITIALIZATION & DATA FETCHING
         // =========================================
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
@@ -459,17 +397,51 @@
         });
 
         async function loadData() {
+            showLoader(true);
             try {
+                // Защита от кэширования
                 const response = await fetch(`proxies.json?v=${Date.now()}`);
-                if (!response.ok) throw new Error('File not found');
-                state.proxies = await response.json();
+                if (!response.ok) throw new Error('Failed to fetch proxies.json');
+                
+                const data = await response.json();
+                
+                // Фильтруем только онлайн и сразу сортируем по пингу (возрастание)
+                state.proxies = data
+                    .filter(p => p.status === 'online')
+                    .sort((a, b) => a.ping - b.ping);
+                
+                updateStats();
+                renderTopProxy();
+                renderProxyList();
             } catch (e) {
-                console.log('Using mock data (proxies.json not found or CORS restricted)');
-                state.proxies = mockProxies;
+                console.error('Ошибка загрузки:', e);
+                renderEmptyState('Не удалось загрузить список прокси. Убедитесь, что файл proxies.json существует и доступен.', 'home');
+                renderEmptyState('Ошибка загрузки данных. Проверьте наличие файла proxies.json.', 'proxies');
+            } finally {
+                showLoader(false);
             }
-            updateStats();
-            renderTopProxy();
-            renderProxyList();
+        }
+
+        function showLoader(show) {
+            const loaders = document.querySelectorAll('.loader-container');
+            loaders.forEach(el => el.style.display = show ? 'flex' : 'none');
+        }
+
+        function renderEmptyState(message, context = 'proxies') {
+            if (context === 'home') {
+                document.getElementById('topProxyContainer').innerHTML = `
+                    <div class="empty-state glass">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <p>${message}</p>
+                    </div>`;
+            } else {
+                document.getElementById('proxyGrid').innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <p>${message}</p>
+                    </div>`;
+                document.getElementById('paginationContainer').innerHTML = '';
+            }
         }
 
         // =========================================
@@ -512,6 +484,7 @@
 
         function setFilter(protocol) {
             state.filter = protocol;
+            state.currentPage = 1; // Сброс на первую страницу при смене фильтра
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.textContent.includes(protocol === 'all' ? 'Все' : protocol));
             });
@@ -520,6 +493,7 @@
 
         function handleSearch(query) {
             state.search = query.toLowerCase();
+            state.currentPage = 1;
             renderProxyList();
         }
 
@@ -527,9 +501,8 @@
         // RENDERING LOGIC
         // =========================================
         function updateStats() {
-            const online = state.proxies.filter(p => p.status === 'online');
-            const total = online.length;
-            const avgPing = total > 0 ? Math.round(online.reduce((acc, p) => acc + p.ping, 0) / total) : 0;
+            const total = state.proxies.length;
+            const avgPing = total > 0 ? Math.round(state.proxies.reduce((acc, p) => acc + p.ping, 0) / total) : 0;
             const now = new Date();
             
             document.getElementById('stat-total').textContent = total;
@@ -537,29 +510,24 @@
             document.getElementById('stat-update').textContent = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function getPingClass(ping) {
-            if (ping < 150) return 'ping-low';
-            if (ping < 300) return 'ping-mid';
-            return 'ping-high';
-        }
-
         function getProxyLink(p) {
             if (p.protocol === 'MTProto') {
-                return `https://t.me/proxy?server=${p.ip}&port=${p.port}&secret=${p.secret}`;
+                return `tg://proxy?server=${p.ip}&port=${p.port}&secret=${p.secret}`;
             }
+            // Для SOCKS5 используем универсальную ссылку Telegram
             return `https://t.me/socks?server=${p.ip}&port=${p.port}`;
         }
 
         function renderTopProxy() {
             const container = document.getElementById('topProxyContainer');
-            const mtprotoOnline = state.proxies.filter(p => p.protocol === 'MTProto' && p.status === 'online');
+            // Берем первый MTProto из отсортированного по пингу массива
+            const best = state.proxies.find(p => p.protocol === 'MTProto');
             
-            if (mtprotoOnline.length === 0) {
+            if (!best) {
                 container.innerHTML = '<div class="glass" style="padding:20px; text-align:center; color:var(--text-secondary);">Нет доступных MTProto прокси для отображения в ТОП-1</div>';
                 return;
             }
 
-            const best = mtprotoOnline.reduce((prev, curr) => prev.ping < curr.ping ? prev : curr);
             const link = getProxyLink(best);
 
             container.innerHTML = `
@@ -616,29 +584,36 @@
 
         function renderProxyList() {
             const grid = document.getElementById('proxyGrid');
-            grid.innerHTML = '';
-            
+            const paginationContainer = document.getElementById('paginationContainer');
+
             let filtered = state.proxies.filter(p => {
                 const matchProtocol = state.filter === 'all' || p.protocol === state.filter;
                 const matchSearch = p.country.toLowerCase().includes(state.search) || p.ip.includes(state.search);
-                return matchProtocol && matchSearch && p.status === 'online';
+                return matchProtocol && matchSearch;
             });
-            
-            filtered.sort((a, b) => a.ping - b.ping);
-            
+
             if (filtered.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Серверы не найдены. Попробуйте изменить фильтры.</div>';
+                grid.innerHTML = '';
+                paginationContainer.innerHTML = '';
+                renderEmptyState('Прокси не найдены по заданным критериям.');
                 return;
             }
-            
-            filtered.forEach(p => {
-                const pingClass = getPingClass(p.ping);
+
+            // Пагинация
+            const totalPages = Math.ceil(filtered.length / state.itemsPerPage);
+            if (state.currentPage > totalPages) state.currentPage = 1;
+
+            const start = (state.currentPage - 1) * state.itemsPerPage;
+            const end = start + state.itemsPerPage;
+            const paginatedItems = filtered.slice(start, end);
+
+            // Рендер карточек
+            grid.innerHTML = paginatedItems.map(p => {
                 const isMtproto = p.protocol === 'MTProto';
                 const link = getProxyLink(p);
                 
-                const card = document.createElement('div');
-                card.className = 'proxy-card glass';
-                card.innerHTML = `
+                return `
+                <div class="proxy-card glass">
                     <div class="proxy-header">
                         <div class="proxy-country">
                             <span class="flag">${p.flag}</span>
@@ -683,9 +658,63 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         </button>
                     </div>
+                </div>
                 `;
-                grid.appendChild(card);
-            });
+            }).join('');
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('paginationContainer');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            
+            // Кнопка "Назад"
+            html += `<button class="page-btn" onclick="changePage(${state.currentPage - 1})" ${state.currentPage === 1 ? 'disabled' : ''}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>`;
+
+            // Генерация номеров страниц (умный диапазон)
+            const maxVisible = 5;
+            let startPage = Math.max(1, state.currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) html += `<span style="color: var(--text-secondary); padding: 0 4px;">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === state.currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span style="color: var(--text-secondary); padding: 0 4px;">...</span>`;
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            // Кнопка "Вперед"
+            html += `<button class="page-btn" onclick="changePage(${state.currentPage + 1})" ${state.currentPage === totalPages ? 'disabled' : ''}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>`;
+
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            state.currentPage = page;
+            renderProxyList();
+            // Плавный скролл к началу списка
+            document.getElementById('proxies').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // =========================================
