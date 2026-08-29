@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Proxy & Tech Hub</title>
-    <meta name="description" content="Многофункциональный портал для управления и подключения к Telegram прокси">
+    <title>Telegram Proxy Hub | NiihoFox</title>
+    <meta name="description" content="Быстрый и безопасный доступ к Telegram через MTProto и SOCKS5 прокси">
     
     <style>
         /* =========================================
@@ -14,6 +14,7 @@
             --accent-primary: #0088cc;
             --accent-secondary: #38bdf8;
             --accent-glow: rgba(0, 136, 204, 0.4);
+            --gold-accent: #fbbf24;
             
             /* Dark Theme (Default) */
             --bg-color: #0f172a;
@@ -21,6 +22,7 @@
                            radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
             --glass-bg: rgba(30, 41, 59, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.05);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --card-hover: rgba(56, 189, 248, 0.1);
@@ -36,22 +38,18 @@
 
         [data-theme="light"] {
             --bg-color: #f1f5f9;
-            --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 136, 204, 0.1) 0%, transparent 40%),
-                           radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(0, 0, 0, 0.05);
+            --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 136, 204, 0.08) 0%, transparent 40%),
+                           radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.06);
+            --glass-highlight: rgba(255, 255, 255, 0.8);
             --text-primary: #0f172a;
             --text-secondary: #64748b;
             --card-hover: rgba(0, 136, 204, 0.08);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: var(--bg-color);
@@ -60,7 +58,7 @@
             color: var(--text-primary);
             min-height: 100vh;
             transition: var(--transition);
-            padding-bottom: 90px; /* Space for mobile nav */
+            padding-bottom: 90px;
         }
 
         /* =========================================
@@ -68,709 +66,271 @@
            ========================================= */
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.95rem;
-            text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 20px; border-radius: 12px; border: none; font-weight: 600;
+            cursor: pointer; transition: var(--transition); font-size: 0.95rem; text-decoration: none;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-            box-shadow: 0 4px 15px var(--accent-glow);
+            color: white; box-shadow: 0 4px 15px var(--accent-glow);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--accent-glow);
-        }
-
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+            background: var(--glass-highlight); color: var(--text-primary);
             border: 1px solid var(--glass-border);
         }
-
-        .btn-secondary:hover {
-            background: var(--card-hover);
-        }
-
-        .btn-icon {
-            padding: 8px;
-            border-radius: 8px;
-            background: transparent;
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-icon:hover {
-            color: var(--accent-secondary);
-            border-color: var(--accent-secondary);
-        }
+        .btn-secondary:hover { background: var(--card-hover); border-color: var(--accent-secondary); }
 
         /* =========================================
            NAVIGATION
            ========================================= */
         .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            height: var(--nav-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--glass-border);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(16px);
+            position: sticky; top: 0; z-index: 100; height: var(--nav-height);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; border-bottom: 1px solid var(--glass-border);
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px);
         }
-
-        [data-theme="light"] .navbar {
-            background: rgba(241, 245, 249, 0.8);
-        }
+        [data-theme="light"] .navbar { background: rgba(241, 245, 249, 0.85); }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: var(--text-primary);
-            text-decoration: none;
+            display: flex; align-items: center; gap: 10px; font-weight: 800;
+            font-size: 1.25rem; color: var(--text-primary); text-decoration: none;
         }
+        .logo svg { width: 32px; height: 32px; fill: var(--accent-primary); }
 
-        .logo svg {
-            width: 32px;
-            height: 32px;
-            fill: var(--accent-primary);
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-        }
-
+        .nav-tabs { display: flex; gap: 8px; }
         .nav-tab {
-            padding: 8px 16px;
-            border-radius: 10px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            font-size: 0.95rem;
+            padding: 8px 16px; border-radius: 10px; color: var(--text-secondary);
+            text-decoration: none; font-weight: 500; transition: var(--transition);
+            cursor: pointer; border: none; background: transparent; font-size: 0.95rem;
         }
-
-        .nav-tab.active {
-            color: var(--accent-secondary);
-            background: rgba(56, 189, 248, 0.1);
-        }
+        .nav-tab.active { color: var(--accent-secondary); background: rgba(56, 189, 248, 0.1); }
 
         .theme-toggle {
-            background: transparent;
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
+            background: transparent; border: 1px solid var(--glass-border);
+            color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition);
         }
-
-        .theme-toggle:hover {
-            background: var(--card-hover);
-            transform: rotate(15deg);
-        }
+        .theme-toggle:hover { background: var(--card-hover); transform: rotate(15deg); }
 
         /* Mobile Bottom Nav */
         .mobile-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            border-top: 1px solid var(--glass-border);
-            z-index: 100;
-            justify-content: space-around;
-            align-items: center;
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            border-top: 1px solid var(--glass-border); z-index: 100;
+            justify-content: space-around; align-items: center;
             padding-bottom: env(safe-area-inset-bottom);
         }
-
         .mobile-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 12px;
-            transition: var(--transition);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: var(--text-secondary); text-decoration: none; font-size: 0.75rem;
+            font-weight: 500; cursor: pointer; padding: 8px 16px; border-radius: 12px;
+            transition: var(--transition); background: none; border: none;
         }
-
-        .mobile-nav-item.active {
-            color: var(--accent-secondary);
-        }
-
-        .mobile-nav-item svg {
-            width: 24px;
-            height: 24px;
-        }
+        .mobile-nav-item.active { color: var(--accent-secondary); }
+        .mobile-nav-item svg { width: 24px; height: 24px; }
 
         /* =========================================
            SECTIONS & ANIMATIONS
            ========================================= */
-        .section {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-            padding: 30px 0;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .section { display: none; animation: fadeIn 0.4s ease-out; padding: 30px 0; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* =========================================
            HOME TAB STYLES
            ========================================= */
-        .hero {
-            text-align: center;
-            padding: 40px 20px;
-            margin-bottom: 30px;
-        }
-
+        .hero { text-align: center; padding: 40px 20px; margin-bottom: 30px; }
         .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 16px;
+            font-size: 2.2rem; font-weight: 800; margin-bottom: 16px;
             background: linear-gradient(135deg, var(--text-primary), var(--accent-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2;
         }
+        .hero p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto 24px; line-height: 1.6; }
 
-        .hero p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 24px;
-            line-height: 1.6;
+        /* TOP-1 Banner */
+        .top-proxy-banner {
+            padding: 24px; margin-bottom: 30px; position: relative; overflow: visible;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(0, 136, 204, 0.05));
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-secondary);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .quick-connect {
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 30px;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            background: linear-gradient(135deg, rgba(0, 136, 204, 0.1), rgba(56, 189, 248, 0.05));
-        }
-
-        .quick-connect h3 {
-            margin-bottom: 12px;
-            font-size: 1.3rem;
-        }
-
-        .quick-connect p {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .tool-card {
-            padding: 24px;
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-4px);
-            background: var(--card-hover);
-            border-color: var(--accent-secondary);
-        }
-
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .tool-card:hover::before {
-            opacity: 1;
-        }
-
-        .tool-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(56, 189, 248, 0.1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            color: var(--accent-secondary);
-        }
-
-        .tool-card h4 {
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-
-        .tool-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .badge-soon {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(250, 204, 21, 0.2);
-            color: #facc15;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        /* =========================================
-           PROXY LIST TAB STYLES
-           ========================================= */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 24px;
-            align-items: center;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 8px;
-            background: var(--glass-bg);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .filter-btn.active {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 16px 10px 40px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: var(--glass-bg);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            outline: none;
-            transition: var(--transition);
-        }
-
-        .search-box input:focus {
-            border-color: var(--accent-secondary);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
-        }
-
-        .search-box svg {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            color: var(--text-secondary);
-        }
-
-        .sort-select {
-            padding: 10px 16px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: var(--glass-bg);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .proxy-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .proxy-card {
-            padding: 20px;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .proxy-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(56, 189, 248, 0.3);
-        }
-
-        .proxy-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
-        .proxy-country {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .flag {
-            font-size: 1.5rem;
-        }
-
-        .country-name {
-            font-weight: 600;
-            font-size: 1.05rem;
-        }
-
-        .protocol-badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
+        .top-proxy-banner::before {
+            content: '👑 ТОП-1'; position: absolute; top: 12px; right: 12px;
+            background: rgba(251, 191, 36, 0.2); color: var(--gold-accent);
+            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;
             letter-spacing: 0.5px;
         }
+        .top-proxy-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .top-proxy-flag { font-size: 3rem; }
+        .top-proxy-info h3 { font-size: 1.5rem; margin-bottom: 4px; }
+        .top-proxy-info .ping { font-size: 1.1rem; font-weight: 700; color: var(--ping-low); }
 
-        .protocol-badge.mtproto {
-            background: rgba(0, 136, 204, 0.2);
-            color: var(--accent-secondary);
-        }
-
-        .protocol-badge.socks5 {
-            background: rgba(74, 222, 128, 0.2);
-            color: #4ade80;
-        }
-
-        .proxy-details {
+        /* --- FIXED GRANULAR ACTIONS --- */
+        .granular-actions {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
+            grid-template-columns: 1fr 1fr; /* IP и Порт делят строку поровну */
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .copy-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: var(--transition);
+            gap: 8px;
+        }
+        [data-theme="light"] .copy-chip { background: rgba(255,255,255,0.5); }
+        .copy-chip:hover { border-color: var(--accent-secondary); background: var(--card-hover); }
+        
+        /* Секретный ключ занимает всю ширину */
+        .copy-chip.secret-chip {
+            grid-column: 1 / -1;
         }
 
-        .detail-item {
+        .copy-chip-content {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            flex: 1;
+            min-width: 0; /* КРИТИЧЕСКИ ВАЖНО: позволяет тексту переноситься внутри flex */
         }
-
-        .detail-label {
+        
+        .copy-chip-label {
+            font-size: 0.7rem;
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
-
-        .detail-value {
+        
+        .copy-chip-value {
             font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
+            word-break: break-all; /* Позволяет длинным IP/ключам переноситься, а не обрезаться */
+            line-height: 1.3;
         }
-
-        .ping-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-
-        .ping-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .ping-low { color: var(--ping-low); }
-        .ping-low .ping-dot { background: var(--ping-low); box-shadow: 0 0 8px var(--ping-low); }
         
-        .ping-mid { color: var(--ping-mid); }
-        .ping-mid .ping-dot { background: var(--ping-mid); box-shadow: 0 0 8px var(--ping-mid); }
-        
-        .ping-high { color: var(--ping-high); }
-        .ping-high .ping-dot { background: var(--ping-high); box-shadow: 0 0 8px var(--ping-high); }
-
-        .proxy-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--glass-border);
+        .copy-chip svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent-secondary);
+            flex-shrink: 0; /* ЗАЩИТА: иконка никогда не сожмется и не перекроется текстом */
         }
 
-        .proxy-actions .btn {
-            flex: 1;
-            padding: 8px;
-            font-size: 0.85rem;
-        }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 30px; }
+        .stat-card { padding: 20px; text-align: center; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--accent-secondary); margin-bottom: 4px; }
+        .stat-label { color: var(--text-secondary); font-size: 0.85rem; }
 
-        .secret-text {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            word-break: break-all;
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-            font-family: monospace;
+        /* =========================================
+           PROXY LIST STYLES
+           ========================================= */
+        .controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; align-items: center; }
+        .filter-group {
+            display: flex; gap: 4px; background: var(--glass-bg); padding: 4px;
+            border-radius: 12px; border: 1px solid var(--glass-border);
         }
+        .filter-btn {
+            padding: 8px 16px; border-radius: 8px; border: none; background: transparent;
+            color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: var(--transition);
+        }
+        .filter-btn.active { background: var(--accent-primary); color: white; }
+
+        .search-box { flex: 1; min-width: 200px; position: relative; }
+        .search-box input {
+            width: 100%; padding: 10px 16px 10px 40px; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: var(--glass-bg);
+            color: var(--text-primary); font-size: 0.95rem; outline: none; transition: var(--transition);
+        }
+        .search-box input:focus { border-color: var(--accent-secondary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
+        .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-secondary); }
+
+        .proxy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .proxy-card { padding: 20px; transition: var(--transition); position: relative; }
+        .proxy-card:hover { transform: translateY(-4px); border-color: rgba(56, 189, 248, 0.3); }
+
+        .proxy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .proxy-country { display: flex; align-items: center; gap: 10px; }
+        .flag { font-size: 1.5rem; }
+        .country-name { font-weight: 600; font-size: 1.05rem; }
+        .protocol-badge {
+            padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .protocol-badge.mtproto { background: rgba(0, 136, 204, 0.2); color: var(--accent-secondary); }
+        .protocol-badge.socks5 { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+
+        .proxy-card-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .proxy-card-actions .btn { flex: 1; padding: 8px; font-size: 0.85rem; }
 
         /* =========================================
            MODAL & TOAST
            ========================================= */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+            padding: 20px; opacity: 0; transition: opacity 0.3s ease;
         }
-
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
+        .modal-overlay.active { display: flex; opacity: 1; }
         .modal-content {
-            background: var(--bg-color);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
+            background: var(--bg-color); border: 1px solid var(--glass-border);
+            border-radius: var(--radius); padding: 30px; max-width: 400px; width: 100%;
+            text-align: center; position: relative; transform: scale(0.9); transition: transform 0.3s ease;
         }
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-
+        .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 4px;
+            position: absolute; top: 16px; right: 16px; background: transparent;
+            border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;
         }
-
-        .qr-image {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            border-radius: 12px;
-            background: white;
-            padding: 10px;
-        }
+        .qr-image { width: 220px; height: 220px; margin: 20px auto; border-radius: 12px; background: white; padding: 10px; }
 
         .toast-container {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px;
         }
-
         .toast {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 12px 20px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            min-width: 250px;
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); color: var(--text-primary);
+            padding: 14px 20px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeOut 0.4s ease 2.6s forwards;
         }
-
-        .toast.success {
-            border-left: 4px solid var(--ping-low);
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateX(100%); }
-        }
+        .toast.success { border-left: 4px solid var(--ping-low); }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(20px); } }
 
         /* =========================================
-           RESPONSIVE DESIGN
+           RESPONSIVE
            ========================================= */
         @media (max-width: 768px) {
-            .nav-tabs, .navbar .theme-toggle {
-                display: none;
-            }
-            
-            .mobile-nav {
-                display: flex;
-            }
-            
-            body {
-                padding-bottom: 80px;
-            }
-            
-            .hero h1 {
-                font-size: 1.8rem;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filter-group {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .proxy-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .toast-container {
-                left: 20px;
-                right: 20px;
-                bottom: 90px;
-            }
-            
-            .toast {
-                width: 100%;
-            }
+            .nav-tabs, .navbar .theme-toggle { display: none; }
+            .mobile-nav { display: flex; }
+            body { padding-bottom: 80px; }
+            .hero h1 { font-size: 1.8rem; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .filter-group { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .proxy-grid { grid-template-columns: 1fr; }
         }
-
-        @media (min-width: 769px) {
-            .mobile-theme-toggle {
-                display: none;
-            }
-        }
+        @media (min-width: 769px) { .mobile-theme-toggle { display: none; } }
     </style>
 </head>
 <body>
@@ -778,50 +338,35 @@
     <!-- Navigation -->
     <nav class="navbar">
         <a href="#" class="logo" onclick="switchTab('home')">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .24z"/>
-            </svg>
-            <span>TechHub</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .24z"/></svg>
+            <span>Proxy Hub</span>
         </a>
-        
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('home')" data-tab="home">Главная</button>
-            <button class="nav-tab" onclick="switchTab('proxies')" data-tab="proxies">Список Прокси</button>
+            <button class="nav-tab" onclick="switchTab('proxies')" data-tab="proxies">Список серверов</button>
         </div>
-
         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Переключить тему">
-            <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
+            <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
     </nav>
 
-    <!-- Main Content -->
     <main class="container">
-        
         <!-- HOME SECTION -->
         <section id="home" class="section active">
             <div class="hero glass">
-                <h1>Telegram Proxy & Tech Hub</h1>
-                <p>Быстрый, надежный и безопасный доступ к Telegram из любой точки мира. Автоматический подбор лучших серверов с минимальным пингом.</p>
-                <button class="btn btn-primary" onclick="quickConnect()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    Подключить самый быстрый прокси
-                </button>
+                <h1>Добро пожаловать, NiihoFox</h1>
+                <p>Многофункциональный портал для управления и мгновенного подключения к лучшим Telegram прокси-серверам с минимальной задержкой.</p>
+            </div>
+
+            <!-- TOP-1 Best Proxy Banner -->
+            <div id="topProxyContainer">
+                <!-- Injected via JS -->
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card glass">
                     <div class="stat-value" id="stat-total">0</div>
-                    <div class="stat-label">Прокси онлайн</div>
+                    <div class="stat-label">Серверов онлайн</div>
                 </div>
                 <div class="stat-card glass">
                     <div class="stat-value" id="stat-ping">0 ms</div>
@@ -829,54 +374,7 @@
                 </div>
                 <div class="stat-card glass">
                     <div class="stat-value" id="stat-update">--:--</div>
-                    <div class="stat-label">Последнее обновление</div>
-                </div>
-            </div>
-
-            <div class="quick-connect glass">
-                <h3>⚡ Мгновенное подключение</h3>
-                <p>Наша система автоматически выбирает MTProto прокси с наименьшей задержкой для вашего региона.</p>
-                <button class="btn btn-primary" onclick="quickConnect()">
-                    Подключить автоматически
-                </button>
-            </div>
-
-            <h3 style="margin-bottom: 20px; font-size: 1.3rem;">Будущие инструменты</h3>
-            <div class="tools-grid">
-                <div class="tool-card glass">
-                    <span class="badge-soon">Скоро</span>
-                    <div class="tool-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    </div>
-                    <h4>Генератор конфигов</h4>
-                    <p>Создание собственных конфигурационных файлов для продвинутых пользователей.</p>
-                </div>
-                
-                <div class="tool-card glass">
-                    <span class="badge-soon">Скоро</span>
-                    <div class="tool-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                    </div>
-                    <h4>Инструкции iOS/Android</h4>
-                    <p>Пошаговые гайды по настройке прокси на мобильных устройствах.</p>
-                </div>
-
-                <div class="tool-card glass">
-                    <span class="badge-soon">Скоро</span>
-                    <div class="tool-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                    </div>
-                    <h4>Проверка доступности IP</h4>
-                    <p>Мониторинг блокировок и проверка чистоты IP-адресов прокси-серверов.</p>
-                </div>
-
-                <div class="tool-card glass">
-                    <span class="badge-soon">Скоро</span>
-                    <div class="tool-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    </div>
-                    <h4>Telegram Bot</h4>
-                    <p>Управление подписками и получение новых прокси прямо в мессенджере.</p>
+                    <div class="stat-label">Обновлено</div>
                 </div>
             </div>
         </section>
@@ -889,40 +387,31 @@
                     <button class="filter-btn" onclick="setFilter('MTProto')">MTProto</button>
                     <button class="filter-btn" onclick="setFilter('SOCKS5')">SOCKS5</button>
                 </div>
-                
                 <div class="search-box">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" id="searchInput" placeholder="Поиск по стране или IP..." oninput="handleSearch(this.value)">
                 </div>
-
-                <select class="sort-select" onchange="handleSort(this.value)">
-                    <option value="ping">Сортировка: Пинг ↑</option>
-                    <option value="ping-desc">Сортировка: Пинг ↓</option>
-                    <option value="country">Сортировка: Страна А-Я</option>
-                </select>
             </div>
-
             <div id="proxyGrid" class="proxy-grid">
-                <!-- Proxy cards will be injected here -->
+                <!-- Injected via JS -->
             </div>
         </section>
-
     </main>
 
     <!-- Mobile Bottom Navigation -->
     <nav class="mobile-nav">
-        <div class="mobile-nav-item active" onclick="switchTab('home')" data-tab="home">
+        <button class="mobile-nav-item active" onclick="switchTab('home')" data-tab="home">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             <span>Главная</span>
-        </div>
-        <div class="mobile-nav-item" onclick="switchTab('proxies')" data-tab="proxies">
+        </button>
+        <button class="mobile-nav-item" onclick="switchTab('proxies')" data-tab="proxies">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-            <span>Прокси</span>
-        </div>
-        <div class="mobile-nav-item mobile-theme-toggle" onclick="toggleTheme()">
+            <span>Серверы</span>
+        </button>
+        <button class="mobile-nav-item mobile-theme-toggle" onclick="toggleTheme()">
             <svg id="mobile-theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             <span>Тема</span>
-        </div>
+        </button>
     </nav>
 
     <!-- QR Code Modal -->
@@ -932,7 +421,7 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <h3 style="margin-bottom: 8px;">QR-код для подключения</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Отсканируйте камерой телефона или Telegram</p>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Отсканируйте камерой телефона</p>
             <img id="qrImage" class="qr-image" src="" alt="QR Code">
             <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="closeModal()">Закрыть</button>
         </div>
@@ -943,24 +432,21 @@
 
     <script>
         // =========================================
-        // DATA & STATE
+        // STATE & MOCK DATA
         // =========================================
         const mockProxies = [
             { id: 1, protocol: 'MTProto', country: 'Germany', flag: '🇩🇪', ip: '142.250.185.46', port: 443, ping: 45, secret: 'dd1234567890abcdef1234567890abcdef', status: 'online' },
             { id: 2, protocol: 'SOCKS5', country: 'USA', flag: '🇺🇸', ip: '104.248.123.45', port: 1080, ping: 120, secret: null, status: 'online' },
             { id: 3, protocol: 'MTProto', country: 'Netherlands', flag: '🇳🇱', ip: '185.199.108.153', port: 8443, ping: 89, secret: 'ee0987654321fedcba0987654321fedcba', status: 'online' },
             { id: 4, protocol: 'MTProto', country: 'Singapore', flag: '🇸🇬', ip: '52.77.210.11', port: 443, ping: 210, secret: 'ff112233445566778899aabbccddeeff', status: 'online' },
-            { id: 5, protocol: 'SOCKS5', country: 'Japan', flag: '🇯🇵', ip: '13.114.45.67', port: 1080, ping: 350, secret: null, status: 'online' },
-            { id: 6, protocol: 'MTProto', country: 'France', flag: '🇫🇷', ip: '51.158.123.89', port: 443, ping: 65, secret: 'aa112233445566778899001122334455', status: 'online' },
-            { id: 7, protocol: 'SOCKS5', country: 'Germany', flag: '🇩🇪', ip: '159.69.153.22', port: 1080, ping: 55, secret: null, status: 'online' },
-            { id: 8, protocol: 'MTProto', country: 'USA', flag: '🇺🇸', ip: '198.51.100.42', port: 8443, ping: 145, secret: 'bb998877665544332211009988776655', status: 'online' }
+            { id: 5, protocol: 'SOCKS5', country: 'Japan', flag: '🇯🇵', ip: '13.114.45.67', port: 1080, ping: 145, secret: null, status: 'online' },
+            { id: 6, protocol: 'MTProto', country: 'France', flag: '🇫🇷', ip: '51.158.123.89', port: 443, ping: 65, secret: 'aa112233445566778899001122334455', status: 'online' }
         ];
 
         let state = {
             proxies: [],
             filter: 'all',
             search: '',
-            sort: 'ping',
             theme: localStorage.getItem('theme') || 'dark'
         };
 
@@ -970,20 +456,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             loadData();
-            updateStats();
         });
 
         async function loadData() {
             try {
-                // Attempt to fetch real data, fallback to mock
-                const response = await fetch('proxies.json');
-                if (!response.ok) throw new Error('Local file not found');
+                const response = await fetch(`proxies.json?v=${Date.now()}`);
+                if (!response.ok) throw new Error('File not found');
                 state.proxies = await response.json();
             } catch (e) {
                 console.log('Using mock data (proxies.json not found or CORS restricted)');
                 state.proxies = mockProxies;
             }
-            renderProxies();
+            updateStats();
+            renderTopProxy();
+            renderProxyList();
         }
 
         // =========================================
@@ -1006,68 +492,49 @@
             const iconHtml = isDark 
                 ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
                 : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-            
             document.getElementById('theme-icon').innerHTML = iconHtml;
             const mobileIcon = document.getElementById('mobile-theme-icon');
             if (mobileIcon) mobileIcon.innerHTML = iconHtml;
         }
 
         // =========================================
-        // NAVIGATION
+        // NAVIGATION & FILTERS
         // =========================================
         function switchTab(tabName) {
-            // Update sections
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             
-            // Update desktop tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(tab => {
+                if(tab.dataset.tab) tab.classList.toggle('active', tab.dataset.tab === tabName);
             });
-            
-            // Update mobile tabs
-            document.querySelectorAll('.mobile-nav-item').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-            
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function setFilter(protocol) {
+            state.filter = protocol;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.includes(protocol === 'all' ? 'Все' : protocol));
+            });
+            renderProxyList();
+        }
+
+        function handleSearch(query) {
+            state.search = query.toLowerCase();
+            renderProxyList();
+        }
+
         // =========================================
-        // STATS
+        // RENDERING LOGIC
         // =========================================
         function updateStats() {
             const online = state.proxies.filter(p => p.status === 'online');
             const total = online.length;
             const avgPing = total > 0 ? Math.round(online.reduce((acc, p) => acc + p.ping, 0) / total) : 0;
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-ping').textContent = avgPing + ' ms';
-            document.getElementById('stat-update').textContent = timeStr;
-        }
-
-        // =========================================
-        // PROXY LIST LOGIC
-        // =========================================
-        function setFilter(protocol) {
-            state.filter = protocol;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent.includes(protocol === 'all' ? 'Все' : protocol));
-            });
-            renderProxies();
-        }
-
-        function handleSearch(query) {
-            state.search = query.toLowerCase();
-            renderProxies();
-        }
-
-        function handleSort(sortType) {
-            state.sort = sortType;
-            renderProxies();
+            document.getElementById('stat-update').textContent = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
         }
 
         function getPingClass(ping) {
@@ -1076,72 +543,143 @@
             return 'ping-high';
         }
 
-        function renderProxies() {
+        function getProxyLink(p) {
+            if (p.protocol === 'MTProto') {
+                return `https://t.me/proxy?server=${p.ip}&port=${p.port}&secret=${p.secret}`;
+            }
+            return `https://t.me/socks?server=${p.ip}&port=${p.port}`;
+        }
+
+        function renderTopProxy() {
+            const container = document.getElementById('topProxyContainer');
+            const mtprotoOnline = state.proxies.filter(p => p.protocol === 'MTProto' && p.status === 'online');
+            
+            if (mtprotoOnline.length === 0) {
+                container.innerHTML = '<div class="glass" style="padding:20px; text-align:center; color:var(--text-secondary);">Нет доступных MTProto прокси для отображения в ТОП-1</div>';
+                return;
+            }
+
+            const best = mtprotoOnline.reduce((prev, curr) => prev.ping < curr.ping ? prev : curr);
+            const link = getProxyLink(best);
+
+            container.innerHTML = `
+                <div class="top-proxy-banner glass">
+                    <div class="top-proxy-header">
+                        <div class="top-proxy-flag">${best.flag}</div>
+                        <div class="top-proxy-info">
+                            <h3>${best.country} (MTProto)</h3>
+                            <div class="ping" style="color: var(--ping-low)">⚡ ${best.ping} ms — Самый быстрый сервер</div>
+                        </div>
+                    </div>
+                    
+                    <div class="granular-actions">
+                        <div class="copy-chip" onclick="copyToClipboard('${best.ip}', 'IP-адрес скопирован!')">
+                            <div class="copy-chip-content">
+                                <div class="copy-chip-label">Сервер (IP)</div>
+                                <div class="copy-chip-value">${best.ip}</div>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </div>
+                        <div class="copy-chip" onclick="copyToClipboard('${best.port}', 'Порт скопирован!')">
+                            <div class="copy-chip-content">
+                                <div class="copy-chip-label">Порт</div>
+                                <div class="copy-chip-value">${best.port}</div>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </div>
+                        <div class="copy-chip secret-chip" onclick="copyToClipboard('${best.secret}', 'Секретный ключ скопирован!')">
+                            <div class="copy-chip-content">
+                                <div class="copy-chip-label">Секретный ключ</div>
+                                <div class="copy-chip-value">${best.secret}</div>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-primary" style="flex: 2;" onclick="window.open('${link}', '_blank')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Подключить
+                        </button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="copyToClipboard('${link}', 'Полная ссылка скопирована!')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Ссылка
+                        </button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="showQR('${link}')">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                            QR
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProxyList() {
             const grid = document.getElementById('proxyGrid');
             grid.innerHTML = '';
             
             let filtered = state.proxies.filter(p => {
                 const matchProtocol = state.filter === 'all' || p.protocol === state.filter;
-                const matchSearch = p.country.toLowerCase().includes(state.search) || 
-                                   p.ip.includes(state.search);
+                const matchSearch = p.country.toLowerCase().includes(state.search) || p.ip.includes(state.search);
                 return matchProtocol && matchSearch && p.status === 'online';
             });
             
-            // Sort
-            filtered.sort((a, b) => {
-                if (state.sort === 'ping') return a.ping - b.ping;
-                if (state.sort === 'ping-desc') return b.ping - a.ping;
-                if (state.sort === 'country') return a.country.localeCompare(b.country);
-                return 0;
-            });
+            filtered.sort((a, b) => a.ping - b.ping);
             
             if (filtered.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Прокси не найдены. Попробуйте изменить фильтры.</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Серверы не найдены. Попробуйте изменить фильтры.</div>';
                 return;
             }
             
-            filtered.forEach(proxy => {
-                const pingClass = getPingClass(proxy.ping);
-                const isMtproto = proxy.protocol === 'MTProto';
-                const proxyUrl = isMtproto 
-                    ? `https://t.me/proxy?server=${proxy.ip}&port=${proxy.port}&secret=${proxy.secret}`
-                    : `https://t.me/socks?server=${proxy.ip}&port=${proxy.port}`;
+            filtered.forEach(p => {
+                const pingClass = getPingClass(p.ping);
+                const isMtproto = p.protocol === 'MTProto';
+                const link = getProxyLink(p);
                 
                 const card = document.createElement('div');
                 card.className = 'proxy-card glass';
                 card.innerHTML = `
                     <div class="proxy-header">
                         <div class="proxy-country">
-                            <span class="flag">${proxy.flag}</span>
-                            <span class="country-name">${proxy.country}</span>
+                            <span class="flag">${p.flag}</span>
+                            <span class="country-name">${p.country}</span>
                         </div>
-                        <span class="protocol-badge ${isMtproto ? 'mtproto' : 'socks5'}">${proxy.protocol}</span>
+                        <span class="protocol-badge ${isMtproto ? 'mtproto' : 'socks5'}">${p.protocol}</span>
                     </div>
                     
-                    <div class="proxy-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Адрес</span>
-                            <span class="detail-value">${proxy.ip}:${proxy.port}</span>
+                    <div class="granular-actions" style="margin-top: 0; margin-bottom: 16px;">
+                        <div class="copy-chip" onclick="copyToClipboard('${p.ip}', 'IP скопирован!')">
+                            <div class="copy-chip-content">
+                                <div class="copy-chip-label">Сервер (IP)</div>
+                                <div class="copy-chip-value">${p.ip}</div>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Пинг</span>
-                            <span class="detail-value ping-indicator ${pingClass}">
-                                <span class="ping-dot"></span>
-                                ${proxy.ping} ms
-                            </span>
+                        <div class="copy-chip" onclick="copyToClipboard('${p.port}', 'Порт скопирован!')">
+                            <div class="copy-chip-content">
+                                <div class="copy-chip-label">Порт</div>
+                                <div class="copy-chip-value">${p.port}</div>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </div>
+                        ${isMtproto ? `
+                        <div class="copy-chip secret-chip" onclick="copyToClipboard('${p.secret}', 'Секретный ключ скопирован!')">
+                            <div class="copy-chip-content">
+                                <div class="copy-chip-label">Секретный ключ</div>
+                                <div class="copy-chip-value">${p.secret}</div>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </div>` : ''}
                     </div>
                     
-                    ${isMtproto ? `<div class="secret-text">Secret: ${proxy.secret}</div>` : ''}
-                    
-                    <div class="proxy-actions">
-                        <button class="btn btn-primary" onclick="window.open('${proxyUrl}', '_blank')">
+                    <div class="proxy-card-actions">
+                        <button class="btn btn-primary" onclick="window.open('${link}', '_blank')">
                             Подключить
                         </button>
-                        <button class="btn btn-secondary" onclick="copyToClipboard('${proxyUrl}')">
+                        <button class="btn btn-secondary" onclick="copyToClipboard('${link}', 'Полная ссылка скопирована!')" title="Копировать ссылку">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         </button>
-                        <button class="btn btn-secondary" onclick="showQR('${proxyUrl}')">
+                        <button class="btn btn-secondary" onclick="showQR('${link}')" title="Показать QR">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         </button>
                     </div>
@@ -1151,38 +689,17 @@
         }
 
         // =========================================
-        // ACTIONS
+        // ACTIONS: COPY, TOAST, QR
         // =========================================
-        function quickConnect() {
-            const mtprotoProxies = state.proxies.filter(p => p.protocol === 'MTProto' && p.status === 'online');
-            if (mtprotoProxies.length === 0) {
-                showToast('Нет доступных MTProto прокси', 'error');
-                return;
-            }
-            
-            // Find fastest
-            const fastest = mtprotoProxies.reduce((prev, curr) => prev.ping < curr.ping ? prev : curr);
-            const url = `https://t.me/proxy?server=${fastest.ip}&port=${fastest.port}&secret=${fastest.secret}`;
-            
-            showToast(`Подключение к ${fastest.country} (${fastest.ping} ms)...`, 'success');
-            setTimeout(() => {
-                window.open(url, '_blank');
-            }, 500);
-        }
-
-        function copyToClipboard(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('Ссылка скопирована в буфер обмена', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
+        function copyToClipboard(text, successMessage) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(() => fallbackCopy(text, successMessage));
             } else {
-                fallbackCopy(text);
+                fallbackCopy(text, successMessage);
             }
         }
 
-        function fallbackCopy(text) {
+        function fallbackCopy(text, successMessage) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
             textarea.style.position = 'fixed';
@@ -1191,27 +708,11 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                showToast('Ссылка скопирована', 'success');
+                showToast(successMessage);
             } catch (err) {
                 showToast('Ошибка копирования', 'error');
             }
             document.body.removeChild(textarea);
-        }
-
-        function showQR(url) {
-            const modal = document.getElementById('qrModal');
-            const img = document.getElementById('qrImage');
-            // Using a reliable public QR API to avoid heavy libraries
-            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(event) {
-            if (!event || event.target.id === 'qrModal' || event.target.closest('.modal-close')) {
-                document.getElementById('qrModal').classList.remove('active');
-                document.body.style.overflow = '';
-            }
         }
 
         function showToast(message, type = 'success') {
@@ -1226,15 +727,25 @@
             toast.innerHTML = `${icon}<span>${message}</span>`;
             container.appendChild(toast);
             
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            setTimeout(() => { toast.remove(); }, 3000);
         }
 
-        // Close modal on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+        function showQR(url) {
+            const modal = document.getElementById('qrModal');
+            const img = document.getElementById('qrImage');
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (!event || event.target.id === 'qrModal' || event.target.closest('.modal-close')) {
+                document.getElementById('qrModal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
     </script>
 </body>
 </html>
