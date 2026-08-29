@@ -212,7 +212,7 @@ async def main():
         proxies = await fetch_sources(session)
         if not proxies:
             logging.error("❌ Не удалось получить ни одного прокси из источников.")
-            return
+            return handle_fallback()
             
         # 2. Проверка доступности
         logging.info("⏳ Проверка доступности и замера пинга...")
@@ -227,16 +227,17 @@ async def main():
         online_proxies = [p for p in checked_proxies if p is not None]
         logging.info(f"✅ Успешно проверено: {len(online_proxies)} прокси.")
         
+        # 3. Если ни один прокси не прошел проверку - используем старые данные
         if not online_proxies:
-            logging.error("❌ Ни один прокси не прошел сетевую проверку.")
-            return
+            logging.warning("⚠️ Ни один прокси не прошел проверку. Пытаемся использовать старые данные...")
+            return handle_fallback()
             
-        # 3. Геолокация
+        # 4. Геолокация
         unique_ips = list(set(p["ip"] for p in online_proxies))
         logging.info(f"🌍 Запрос геолокации для {len(unique_ips)} уникальных IP...")
         geo_data = await get_geolocation_batched(session, unique_ips)
         
-        # 4. Обогащение данных, сортировка и выборка ТОП-50
+        # 5. Обогащение данных, сортировка и выборка ТОП-50
         final_proxies = []
         for p in online_proxies:
             ip_info = geo_data.get(p["ip"], {})
@@ -259,21 +260,53 @@ async def main():
         for idx, proxy in enumerate(top_proxies, start=1):
             proxy["id"] = idx
             
-        # 5. Сохранение в файл
-        output_data = {
-            "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "total": len(top_proxies),
-            "proxies": top_proxies
-        }
+        # 6. Сохранение в файл
+        save_proxies(top_proxies)
+
+def save_proxies(proxies_list: list):
+    """Сохраняет список прокси в JSON."""
+    output_data = {
+        "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "total": len(proxies_list),
+        "proxies": proxies_list
+    }
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=2, ensure_ascii=False)
+    logging.info(f"🎉 Готово! Сохранено {len(proxies_list)} прокси в {OUTPUT_FILE}")
+
+def handle_fallback():
+    """Обработка сбоев: если новых прокси нет, берем старые или создаем пустой файл."""
+    try:
+        # Пытаемся прочитать старый файл
+        with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+            old_data = json.load(f)
+        # Обновляем только время, чтобы фронтенд понимал, что скрипт запускался
+        old_data["updated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        old_data["is_fallback"] = True # Пометка для фронтенда (опционально)
         
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            json.dump(output_data, f, indent=2, ensure_ascii=False)
-            
-        logging.info(f"🎉 Готово! Сохранено ТОП-{len(top_proxies)} прокси в {OUTPUT_FILE}")
+            json.dump(old_data, f, indent=2, ensure_ascii=False)
+        logging.info("✅ Сбой проверки. Использованы старые данные из proxies.json.")
+    except FileNotFoundError:
+        # Если старого файла вообще нет (первый запуск), создаем пустой, чтобы сайт не упал
+        logging.warning("⚠️ Старый файл не найден. Создаем пустой proxies.json.")
+        empty_data = {
+            "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "total": 0,
+            "proxies": [],
+            "error": "No proxies available at the moment"
+        }
+        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(empty_data, f, indent=2, ensure_ascii=False)
 
 if __name__ == "__main__":
     import sys
-    # На Windows нужна эта политика, на Linux (GitHub Actions) она не обязательна, но не мешает
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    asyncio.run(main())
+    
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        # Глобальный перехватчик ошибок. Если скрипт упал с критической ошибкой, все равно создаем файл!
+        logging.critical(f"💥 Критическая ошибка скрипта: {e}")
+        handle_fallback()
