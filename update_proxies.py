@@ -23,18 +23,10 @@ FALLBACK_PROXIES = [
 
 # Надежные и регулярно обновляемые публичные источники
 PROXY_SOURCES = [
-    # MTProto
+    # MTProto - основные источники из задачи
+    "https://raw.githubusercontent.com/Feniiiks83/FoxDenApp.github.io/main/workproxies.txt",
+    "https://raw.githubusercontent.com/Argh94/Proxy-List/main/MTProto.txt",
     "https://raw.githubusercontent.com/SoliSpirit/mtproto/master/all_proxies.txt",
-    "https://raw.githubusercontent.com/Argh94/Proxy-List/main/mtproto.txt",
-    "https://raw.githubusercontent.com/Grim1313/mtproto-for-telegram/main/all_proxies.txt",
-    # SOCKS5 & Telegram
-    "https://raw.githubusercontent.com/proxygenerator1/ProxyGenerator/main/telegramProxys.txt",
-    "https://raw.githubusercontent.com/proxygenerator1/ProxyGenerator/main/MostStable/socks5.txt",
-    "https://raw.githubusercontent.com/Argh94/Proxy-List/main/socks5.txt",
-    "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/socks5.txt",
-    "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/socks5/raw/all.txt",
-    "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks5.txt",
-    "https://raw.githubusercontent.com/hookzof/socks5_list/master/proxy.txt",
 ]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -59,11 +51,14 @@ def parse_proxy_line(line: str) -> Optional[Dict]:
     if line.startswith('tg://') or 't.me/proxy' in line:
         try:
             parsed_url = urlparse(line)
-            query_params = parse_qs(parsed_url.query)
+            query_params = parse_qs(parsed_url.query, keep_blank_values=True)
             server = query_params.get('server', [None])[0]
             port_str = query_params.get('port', [None])[0]
             secret = query_params.get('secret', [None])[0]
             if server and port_str and secret:
+                # URL-decode для секрета (на случай %3D%3D и подобных)
+                from urllib.parse import unquote
+                secret = unquote(secret)
                 return {
                     "protocol": "MTProto",
                     "ip": server,
@@ -83,7 +78,17 @@ def parse_proxy_line(line: str) -> Optional[Dict]:
             "secret": mtproto_match.group(3)
         }
 
-    # 3. Парсинг формата IP:PORT (SOCKS5)
+    # 3. Парсинг формата HOSTNAME:PORT:SECRET (MTProto с доменом)
+    mtproto_hostname_match = re.match(r'^([a-zA-Z0-9][a-zA-Z0-9\-\.]*):(\d{2,5}):((?:ee|dd)?[a-fA-F0-9]{32,64})$', line)
+    if mtproto_hostname_match:
+        return {
+            "protocol": "MTProto",
+            "ip": mtproto_hostname_match.group(1),
+            "port": int(mtproto_hostname_match.group(2)),
+            "secret": mtproto_hostname_match.group(3)
+        }
+
+    # 4. Парсинг формата IP:PORT (SOCKS5)
     socks_match = re.match(r'^(\d{1,3}(?:\.\d{1,3}){3}):(\d{2,5})$', line)
     if socks_match:
         return {
@@ -120,9 +125,12 @@ async def check_socks5(proxy: dict, semaphore: asyncio.Semaphore) -> Optional[di
     return None
 
 async def check_mtproto(proxy: dict, semaphore: asyncio.Semaphore) -> Optional[dict]:
-    """Валидация MTProto: строгая проверка секрета + базовое TCP-подключение."""
+    """Валидация MTProto: проверка секрета (hex или base64) + базовое TCP-подключение."""
     secret = proxy.get("secret", "")
-    if not re.match(r'^(?:ee|dd)?[a-fA-F0-9]{32,64}$', secret):
+    # Разрешаем hex-секреты (ee/dd префикс) и base64-секреты (любой printable ASCII)
+    is_valid_hex = re.match(r'^(?:ee|dd)?[a-fA-F0-9]{32,64}$', secret)
+    is_valid_base64 = re.match(r'^[A-Za-z0-9+/=]{16,64}$', secret)
+    if not (is_valid_hex or is_valid_base64):
         return None
 
     async with semaphore:
