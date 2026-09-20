@@ -1,13 +1,10 @@
 name: Update Telegram Proxies
 
 on:
-  # Запуск по расписанию: каждые 2 часа (в 00 минут)
   schedule:
-    - cron: '0 */2 * * *'
-  # Возможность ручного запуска из вкладки Actions
-  workflow_dispatch:
+    - cron: '0 */2 * * *'  # Каждые 2 часа
+  workflow_dispatch:        # Ручной запуск
 
-# Разрешения для токена GITHUB_TOKEN
 permissions:
   contents: write
 
@@ -15,43 +12,33 @@ jobs:
   update-proxies:
     runs-on: ubuntu-latest
     steps:
-      # 1. Клонирование репозитория
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      # 2. Установка Python 3.11 с кэшированием зависимостей pip
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      # 3. Установка зависимостей
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install aiohttp
 
-      # 4. Запуск скрипта сборщика
       - name: Run proxy updater script
         run: python update_proxies.py
 
-      # 5. Настройка Git и безопасное сохранение изменений
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Определяем текущую ветку
           CURRENT_BRANCH=$(git branch --show-current)
-          echo "Current branch: $CURRENT_BRANCH"
-          
-          # Синхронизация на случай параллельных изменений
           git pull --rebase origin $CURRENT_BRANCH || true
           
-          # Проверяем, есть ли изменения в файле
           if git diff --quiet proxies.json; then
             echo "No changes to proxies.json. Skipping commit."
             exit 0
